@@ -119,6 +119,10 @@
 #   (bool) If true, require the git package. If false do nothing.
 #   Defaults to false
 #
+# [*virtualenv_dir*]
+#   (bool) Set location where virtualenv will be installed
+#   Defaults to undef
+#
 # [*manage_virtualenv*]
 #   (bool) If true, require the virtualenv package. If false do nothing.
 #   Defaults to false
@@ -195,6 +199,7 @@ class puppetboard(
   Boolean $manage_git                                         = false,
   Boolean $manage_virtualenv                                  = false,
   String[1]  $virtualenv_version                              = $puppetboard::params::virtualenv_version,
+  Optional[String] $virtualenv_dir                            = undef,
   Integer $reports_count                                      = $puppetboard::params::reports_count,
   String $default_environment                                 = $puppetboard::params::default_environment,
   String $listen                                              = $puppetboard::params::listen,
@@ -256,7 +261,8 @@ class puppetboard(
     require => Vcsrepo["${basedir}/puppetboard"],
   }
 
-  python::virtualenv { "${basedir}/virtenv-puppetboard":
+  $virtualenv_dir_real = pick($virtualenv_dir, "${basedir}/virtenv-puppetboard")
+  python::virtualenv { $virtualenv_dir_real:
     ensure       => present,
     version      => $virtualenv_version,
     requirements => "${basedir}/puppetboard/requirements.txt",

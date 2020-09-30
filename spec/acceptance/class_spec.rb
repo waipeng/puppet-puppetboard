@@ -45,11 +45,21 @@ describe 'puppetboard class' do
         include epel
         class { 'apache::mod::wsgi': wsgi_socket_prefix => '/var/run/wsgi' }
       } else {
-        class { 'apache::mod::wsgi': }
+        class { 'apache::mod::wsgi':
+          package_name => "libapache2-mod-wsgi-py3",
+          mod_path     => "/usr/lib/apache2/modules/mod_wsgi.so",
+        }
       }
+      
+      # Configure PuppetDB
+      class { 'puppetdb': disable_ssl => true, }
 
       # Configure Puppetboard
-      class { 'puppetboard': }
+      class { 'puppetboard':
+        manage_virtualenv  => true,
+        virtualenv_version => '3',
+        virtualenv_dir     => "${basedir}/virtenv3-puppetboard",
+      }
 
       # Access Puppetboard through pboard.example.com
       class { 'puppetboard::apache::vhost':

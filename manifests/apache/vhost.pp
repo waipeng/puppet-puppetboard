@@ -111,6 +111,7 @@ class puppetboard::apache::vhost (
     threads => $threads,
     group   => $group,
     user    => $user,
+    python-home    => "${basedir}/virtenv-puppetboard/",
   }
 
   file { "${docroot}/wsgi.py":
